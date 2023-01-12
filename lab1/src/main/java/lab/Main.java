@@ -1,4 +1,6 @@
-import utils.Timer;
+package lab;
+
+import lab.utils.Timer;
 
 import java.io.IOException;
 

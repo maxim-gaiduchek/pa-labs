@@ -1,3 +1,5 @@
+package lab;
+
 import java.io.*;
 import java.util.*;
 import java.util.stream.LongStream;
@@ -182,7 +184,7 @@ public class Sorts {
     }
 
     /**
-     * Sorts parts of the data file
+     * lab.Sorts parts of the data file
      *
      * @param dataFileName       Given data file path
      * @param partedDataFileName Given data file path
