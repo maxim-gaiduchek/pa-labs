@@ -33,10 +33,30 @@ public class FileUtils {
         }
     }
 
-    public static void writeToFile
+    public static List<BufferedWriter> createWriters(String path, int numberOfFiles) {
+        try {
+            List<BufferedWriter> writers = new ArrayList<>();
+
+            for (int i = 0; i < numberOfFiles; i++) {
+                File file = new File(path + i + ".lab");
+
+                writers.add(new BufferedWriter(new FileWriter(file)));
+            }
+
+            return writers;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 
     public static void writeToFile(String path, List<Integer> numbers) throws IOException {
-        Writer writer = new FileWriter(path, true);
+        writeToFile(path, numbers, true);
+    }
+
+    public static void writeToFile(String path, List<Integer> numbers, boolean append) throws IOException {
+        Writer writer = new FileWriter(path, append);
 
         for (int n : numbers) {
             writer.write(n + "\n");
@@ -79,9 +99,11 @@ public class FileUtils {
             for (int i = 0; i < numberOfFiles; i++) {
                 File file = new File(path + i + ".lab");
 
-                if (file.length() > 0) {
-                    readers.add(new BufferedReader(new FileReader(file)));
+                if (file.length() <= 0) {
+                    continue;
                 }
+
+                readers.add(new BufferedReader(new FileReader(file)));
             }
 
             return readers;

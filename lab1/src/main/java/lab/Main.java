@@ -9,18 +9,17 @@ import java.io.IOException;
 
 public class Main {
 
-    private static final String FILE_PATH =
-            "A/10MB.lab";
+    private static final String FILE_PATH = "data/100MB.lab";
 
     private static final long MEGABYTE = (long) Math.pow(2, 20);
     private static final long GIGABYTE = (long) Math.pow(2, 30);
 
     public static void main(String[] args) {
         try {
-            //System.out.print("Generating 10 MB file... ");
-            //generateDataFile(2 * GIGABYTE);
+            System.out.print("Generating 100 MB file... ");
+            generateDataFile(100 * MEGABYTE);
 
-            // normalSort();
+            normalSort();
             modifiedSort();
         } catch (IOException e) {
             e.printStackTrace();
@@ -62,7 +61,7 @@ public class Main {
     }
 
     /**
-     * Sorting by modified algorithm with 2 GB data
+     * Sorting by modified algorithm with 1 GB data
      *
      * @throws IOException File exception
      */
