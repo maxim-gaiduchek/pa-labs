@@ -4,7 +4,10 @@ import lab.entities.Cell;
 import lab.entities.Maze;
 import lab.entities.Result;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
 
 public class AStarAlgorithm {
 
