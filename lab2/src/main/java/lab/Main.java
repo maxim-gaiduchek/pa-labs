@@ -185,7 +185,7 @@ public class Main {
 
     public static void aStar(Maze maze, Cell start, Cell end) {
         Timer timer = new Timer();
-        System.out.print("AStar started...");
+        System.out.print("A* started...");
         timer.start();
         Result result = AStarAlgorithm.solve(maze, start, end);
         timer.stop();
@@ -196,8 +196,8 @@ public class Main {
 
     private static void printResult(Maze maze, Result result, Cell start, Cell end) {
         System.out.println("Results");
-        System.out.printf("Iterations: %d, States: %d, Saved states: %d\n",
-                result.getIterations(), result.getStates(), result.getSavedStates());
+        System.out.printf("Iterations: %d, States: %d, Saved states: %d, Blind Corners: %d\n",
+                result.getIterations(), result.getStates(), result.getSavedStates(), result.getUnsavedStates());
         System.out.printf("Path - '%c', Wall - '%c'\n", Cell.Type.PATH.getChar(), Cell.Type.WALL.getChar());
 
         int heightDim = (int) Math.log10(maze.getHeight()) + 1;

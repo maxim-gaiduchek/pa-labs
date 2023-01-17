@@ -81,7 +81,8 @@ public class AStarAlgorithm {
         int index = 0;
         QueueItem queueItem = queueList.get(0);
 
-        while (index < queue.size() - 1 && item.distance + item.path.size() > queueItem.distance + queueItem.path.size()) {
+        while (index < queue.size() - 1 &&
+                item.distance + item.path.size() > queueItem.distance + queueItem.path.size()) {
             queueItem = queueList.get(++index);
         }
         queueList.add(index, item);
@@ -105,9 +106,9 @@ public class AStarAlgorithm {
             path = new ArrayList<>();
         }
 
-        public QueueItem(Cell cell, QueueItem item) {
+        public QueueItem(Cell cell, QueueItem previous) {
             this.cell = cell;
-            path = new ArrayList<>(item.path);
+            path = new ArrayList<>(previous.path);
         }
 
         @Override

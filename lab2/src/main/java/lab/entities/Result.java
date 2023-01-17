@@ -40,6 +40,10 @@ public class Result {
         return savedStates;
     }
 
+    public int getUnsavedStates() {
+        return states - savedStates;
+    }
+
     public void setPath(List<Cell> path) {
         this.path = path;
     }
