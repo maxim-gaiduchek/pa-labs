@@ -4,10 +4,10 @@ import lab.algorithms.AStarAlgorithm;
 import lab.algorithms.BfsAlgorithm;
 import lab.entities.Cell;
 import lab.entities.Maze;
+import lab.entities.Result;
 import lab.factories.MazeFactory;
 import lab.utils.Timer;
 
-import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -125,7 +125,7 @@ public class Main {
         Cell end = maze.getCell(maze.getWidth() - 1, maze.getHeight() - 1);
 
         bfs(maze, start, end);
-        //aStar(maze, start, end);
+        aStar(maze, start, end);
     }
 
     public static Pair generateHeightAndWidth() {
@@ -154,7 +154,7 @@ public class Main {
         Timer timer = new Timer();
         System.out.print("BFS started...");
         timer.start();
-        List<Cell> result = BfsAlgorithm.solve(maze, start, end);
+        Result result = BfsAlgorithm.solve(maze, start, end);
         timer.stop();
         System.out.println(" Done");
         System.out.println("Time spent: " + timer.getTime());
@@ -165,16 +165,18 @@ public class Main {
         Timer timer = new Timer();
         System.out.print("AStar started...");
         timer.start();
-        List<Cell> result = AStarAlgorithm.solve(maze, start, end);
+        Result result = AStarAlgorithm.solve(maze, start, end);
         timer.stop();
         System.out.println(" Done");
         System.out.println("Time spent: " + timer.getTime());
         printResult(maze, result, start, end);
     }
 
-    private static void printResult(Maze maze, List<Cell> cells, Cell start, Cell end) {
-        System.out.printf("Result (path - '%s', wall - '%s'):\n",
-                Cell.Type.PATH.getChar(), Cell.Type.WALL.getChar());
+    private static void printResult(Maze maze, Result result, Cell start, Cell end) {
+        System.out.println("Results");
+        System.out.printf("Iterations: %d, States: %d, Saved states: %d\n",
+                result.getIterations(), result.getStates(), result.getSavedStates());
+        System.out.printf("Path - '%c', Wall - '%c'\n", Cell.Type.PATH.getChar(), Cell.Type.WALL.getChar());
 
         int heightDim = (int) Math.log10(maze.getHeight()) + 1;
         int widthDim = (int) Math.log10(maze.getWidth()) + 1;
@@ -194,21 +196,19 @@ public class Main {
                 String ch = Character.toString(cell.getType().getChar());
                 if (cell.equals(start) || cell.equals(end)) {
                     ch = "\u001B[31m" + ch + "\u001B[0m";
-                } else if (cells != null) {
-                    for (Cell mazeCell : cells) {
-                        if (!mazeCell.hasCoordinates(x, y)) {
-                            continue;
+                } else if (result.hasPath()) {
+                    for (Cell mazeCell : result.getPath()) {
+                        if (mazeCell.hasCoordinates(x, y)) {
+                            ch = "\u001B[32m" + ch + "\u001B[0m";
+                            break;
                         }
-
-                        ch = "\u001B[32m" + ch + "\u001B[0m";
-                        break;
                     }
                 }
                 System.out.print(" ".repeat(widthDim) + ch);
             }
             System.out.println();
         }
-        System.out.println(cells == null ? "Maze cannot be solved" : "");
+        System.out.println(result.hasPath() ? "" : "Maze cannot be solved");
     }
 
     private record Pair(int num1, int num2) {

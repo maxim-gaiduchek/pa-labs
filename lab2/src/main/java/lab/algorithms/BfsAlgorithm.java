@@ -2,6 +2,7 @@ package lab.algorithms;
 
 import lab.entities.Cell;
 import lab.entities.Maze;
+import lab.entities.Result;
 
 import java.util.*;
 
@@ -10,29 +11,32 @@ public class BfsAlgorithm {
     private static final int[] DIR_X = {-1, 0, 1, 0};
     private static final int[] DIR_Y = {0, -1, 0, 1};
 
-    public static List<Cell> solve(Maze maze, Cell start, Cell end) {
+    public static Result solve(Maze maze, Cell start, Cell end) {
         if (start.getType() != Cell.Type.PATH || end.getType() != Cell.Type.PATH) {
-            return null;
+            return new Result();
         }
         if (start.equals(end)) {
-            return new ArrayList<>(0);
+            return new Result(new ArrayList<>(0), 0, 0, 0);
         }
 
+        Result result = new Result();
         boolean[][] visited = new boolean[maze.getHeight()][maze.getWidth()];
         visited[start.getY()][start.getX()] = true;
-
         Deque<QueueItem> queue = new ArrayDeque<>();
         queue.add(new QueueItem(start));
 
         while (!queue.isEmpty()) {
             QueueItem item = queue.poll();
             Cell cell = item.cell;
+            result.increaseIterations();
 
             if (cell.equals(end)) {
-                return getPath(item);
+                result.setPath(getPath(item));
+                return result;
             }
 
             for (int i = 0; i < 4; i++) {
+                result.increaseStates();
                 int x = cell.getX() + DIR_X[i];
                 int y = cell.getY() + DIR_Y[i];
 
@@ -42,16 +46,17 @@ public class BfsAlgorithm {
 
                 Cell neighbourCell = maze.getCell(x, y);
 
-                if (neighbourCell.getType() != Cell.Type.PATH || visited[y][x]) {
+                if (neighbourCell.getType() != Cell.Type.PATH) {
                     continue;
                 }
 
+                result.increaseSavedStates();
                 visited[y][x] = true;
                 queue.add(new QueueItem(neighbourCell, item));
             }
         }
 
-        return null;
+        return new Result();
     }
 
     private static List<Cell> getPath(QueueItem item) {
