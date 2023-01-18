@@ -35,6 +35,10 @@ public class GraphNode {
         return nodes;
     }
 
+    public int getDegree() {
+        return nodes.size();
+    }
+
     public int getColor() {
         return color;
     }
@@ -43,6 +47,10 @@ public class GraphNode {
 
     public void setNodes(Set<GraphNode> nodes) {
         this.nodes = nodes;
+    }
+
+    public boolean containsNode(GraphNode node) {
+        return nodes.contains(node);
     }
 
     public void addNode(GraphNode node) {

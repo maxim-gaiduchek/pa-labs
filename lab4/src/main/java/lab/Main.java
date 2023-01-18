@@ -3,6 +3,7 @@ package lab;
 import lab.controllers.WindowController;
 import lab.entities.GraphNode;
 import lab.views.GraphPanel;
+import lab.views.ProcessPanel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,14 +15,16 @@ public class Main {
 
     private static final int GRAPH_SIZE = 200;
     private static final int GRAPH_MIN_DEGREE = 1;
-    private static final int GRAPH_MAX_DEGREE = 20;
+    private static final int GRAPH_MAX_DEGREE = Math.min(GRAPH_SIZE - 1, 20);
 
     public static void main(String[] args) {
         List<GraphNode> nodes = generateGraph();
-        GraphPanel panel = new GraphPanel(nodes);
         WindowController controller = new WindowController();
-
-        controller.setPanel(panel);
+        ProcessPanel processPanel = new ProcessPanel();
+        controller.setPanel(processPanel);
+        controller.showPanel();
+        GraphPanel graphPanel = new GraphPanel(nodes);
+        controller.setPanel(graphPanel);
         controller.showPanel();
     }
 
@@ -35,7 +38,7 @@ public class Main {
             GraphNode node = nodes.get(i);
             if (i == 0) {
                 for (int j = 0; j < GRAPH_MAX_DEGREE; j++) {
-                    node.setNodes(IntStream.rangeClosed(GRAPH_MIN_DEGREE, GRAPH_MAX_DEGREE)
+                    node.setNodes(IntStream.rangeClosed(1, GRAPH_MAX_DEGREE)
                             .mapToObj(index -> {
                                 GraphNode graphNode = nodes.get(index);
                                 graphNode.addNode(node);
@@ -46,22 +49,22 @@ public class Main {
                 }
                 continue;
             }
-            /*for (int j = 0; j < random.nextInt(GRAPH_MIN_DEGREE, GRAPH_MAX_DEGREE + 1); j++) {
-
-            }*/
+            int size = node.getDegree();
+            if (size >= GRAPH_MAX_DEGREE) {
+                continue;
+            }
+            for (int j = node.getDegree(); j < random.nextInt(GRAPH_MIN_DEGREE, GRAPH_MAX_DEGREE + 1); j++) {
+                GraphNode nextNode;
+                int index;
+                do {
+                    index = random.nextInt(nodes.size());
+                    nextNode = nodes.get(index);
+                } while (index == i || nextNode.getDegree() >= GRAPH_MAX_DEGREE || node.containsNode(nextNode));
+                node.addNode(nextNode);
+                nextNode.addNode(node);
+            }
         }
 
         return nodes;
-    }
-
-    private static GraphNode getNode(List<GraphNode> nodes, int i) {
-        Random random = new Random();
-        GraphNode node;
-        int index;
-        do {
-            index = random.nextInt(nodes.size());
-            node = nodes.get(index);
-        } while (index == i);
-        return node;
     }
 }

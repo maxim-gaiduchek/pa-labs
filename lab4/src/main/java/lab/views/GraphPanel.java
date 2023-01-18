@@ -4,14 +4,13 @@ import lab.entities.GraphNode;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Collections;
 import java.util.List;
 
 public class GraphPanel extends JPanel {
 
     public static final int GRAPH_NODES_WIDTH = 20;
     private static final int GRAPH_NODES_HEIGHT = 10;
-    private static final int GRAPH_NODES_DOT_RADIUS = 10;
+    private static final int GRAPH_NODES_DOT_RADIUS = 15;
 
     private final List<GraphNode> nodes;
 
@@ -25,7 +24,7 @@ public class GraphPanel extends JPanel {
 
     @Override
     public void paint(Graphics g) {
-        super.paintComponent(g);
+        super.paint(g);
 
         Graphics2D g2d = (Graphics2D) g;
         for (GraphNode node : nodes) {
@@ -38,7 +37,7 @@ public class GraphPanel extends JPanel {
             Point point0 = getPoint(node);
             int x0 = point0.x, y0 = point0.y;
             g2d.setColor(Color.BLACK);
-            for(GraphNode nextNode : node.getNodes()) {
+            for (GraphNode nextNode : node.getNodes()) {
                 Point point = getPoint(nextNode);
                 g2d.drawLine(x0, y0, point.x, point.y);
             }

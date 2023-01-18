@@ -4,6 +4,7 @@ import javax.swing.*;
 
 public class WindowController {
 
+    private JFrame lastFrame;
     private JPanel panel;
 
     public void setPanel(JPanel panel) {
@@ -11,14 +12,14 @@ public class WindowController {
     }
 
     public void showPanel() {
-        if (panel != null) {
-            panel.setVisible(false);
+        if (lastFrame != null) {
+            lastFrame.setVisible(false);
         }
-        JFrame frame = new JFrame();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(panel);
-        frame.setSize(panel.getSize());
+        lastFrame = new JFrame();
+        lastFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        lastFrame.add(panel);
+        lastFrame.setSize(panel.getSize());
         panel.setVisible(true);
-        frame.setVisible(true);
+        lastFrame.setVisible(true);
     }
 }
