@@ -19,6 +19,7 @@ public class WindowController {
         lastFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         lastFrame.add(panel);
         lastFrame.setSize(panel.getSize());
+        lastFrame.setResizable(false);
         panel.setVisible(true);
         lastFrame.setVisible(true);
     }

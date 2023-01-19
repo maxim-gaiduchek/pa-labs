@@ -8,7 +8,7 @@ public class ProcessPanel extends JPanel {
     public ProcessPanel() {
         super();
 
-        setSize(300, 200);
+        setSize(300, 100);
     }
 
     @Override
@@ -16,6 +16,7 @@ public class ProcessPanel extends JPanel {
         super.paint(g);
 
         Graphics2D g2d = (Graphics2D) g;
-        g2d.drawString("Йде процес розфарбовки. Чекайте...", 50, 50);
+        g2d.setFont(new Font(null, Font.PLAIN, 16));
+        g2d.drawString("Йде процес розфарбовки. Чекайте...", 10, 30);
     }
 }

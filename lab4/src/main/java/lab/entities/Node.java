@@ -3,26 +3,15 @@ package lab.entities;
 import java.util.HashSet;
 import java.util.Set;
 
-public class GraphNode {
+public class Node {
 
     private final int id;
-    private Set<GraphNode>nodes;
-    private int color = 0;
+    private Set<Node> nodes;
+    private int color = -1;
 
-    public GraphNode(int id) {
+    public Node(int id) {
         this.id = id;
         nodes = new HashSet<>();
-    }
-
-    public GraphNode(int id, Set<GraphNode> nodes) {
-        this.id = id;
-        this.nodes = nodes;
-    }
-
-    public GraphNode(int id, int color) {
-        this.id = id;
-        nodes = new HashSet<>();
-        this.color = color;
     }
 
     // getters
@@ -31,7 +20,7 @@ public class GraphNode {
         return id;
     }
 
-    public Set<GraphNode> getNodes() {
+    public Set<Node> getNodes() {
         return nodes;
     }
 
@@ -43,17 +32,21 @@ public class GraphNode {
         return color;
     }
 
+    public boolean isPained() {
+        return color >= 0;
+    }
+
     // setters
 
-    public void setNodes(Set<GraphNode> nodes) {
+    public void setNodes(Set<Node> nodes) {
         this.nodes = nodes;
     }
 
-    public boolean containsNode(GraphNode node) {
+    public boolean containsNode(Node node) {
         return nodes.contains(node);
     }
 
-    public void addNode(GraphNode node) {
+    public void addNode(Node node) {
         nodes.add(node);
     }
 
@@ -68,7 +61,7 @@ public class GraphNode {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        GraphNode graphNode = (GraphNode) o;
+        Node graphNode = (Node) o;
 
         if (color != graphNode.color) return false;
         return nodes.equals(graphNode.nodes);
@@ -76,9 +69,9 @@ public class GraphNode {
 
     @Override
     public String toString() {
-        return "GraphNode{" +
+        return "Node{" +
                 "id=" + id +
-                "color=" + color +
+                ", color=" + color +
                 '}';
     }
 }
