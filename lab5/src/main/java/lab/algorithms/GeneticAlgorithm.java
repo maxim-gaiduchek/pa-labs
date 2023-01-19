@@ -9,12 +9,12 @@ public class GeneticAlgorithm {
 
     private static final int POPULATION_SIZE = 1000;
     private static final int BREEDING_POOL_SIZE = POPULATION_SIZE / 10;
-    private static final int MAX_ITERATIONS = 100000;
+    private static final long MAX_ITERATIONS = (long) Math.pow(10, 8);
 
-    public static void solve(int[][] matrix, double mutationProbability, int parents) {
+    public static Path solve(int[][] matrix, double mutationProbability, int parts) {
         Path[] generation = createInitialGeneration(matrix);
         Random random = new Random();
-        for (int i = 0; i < MAX_ITERATIONS; i++) {
+        for (long i = 0; i < MAX_ITERATIONS; i++) {
             Path[] breedingPool = Arrays.stream(generation)
                     .sorted(Comparator.comparing(Path::getCost))
                     .limit(BREEDING_POOL_SIZE)
@@ -33,15 +33,17 @@ public class GeneticAlgorithm {
 
                 Path first = breedingPool[choosePath(probabilities)];
                 Path second = breedingPool[choosePath(probabilities)];
-                newPopulation[j] = cross(matrix, parents, first, second);
+                newPopulation[j] = crossover(matrix, parts, first, second);
                 if (random.nextDouble() < mutationProbability) {
                     mutate(newPopulation[j]);
                 }
             }
             generation = newPopulation;
-            System.out.printf("%d %d\n",
+            System.out.printf("Iteration: %d, Best cost: %d\n",
                     i, getBestPath(generation).getCost());
         }
+
+        return getBestPath(generation);
     }
 
     private static Path[] createInitialGeneration(int[][] matrix) {
@@ -72,17 +74,17 @@ public class GeneticAlgorithm {
         path.getPath()[second] = temp;
     }
 
-    private static Path cross(int[][] matrix, int parents, Path first, Path second) {
-        int parentSize = matrix.length / parents;
+    private static Path crossover(int[][] matrix, int parts, Path first, Path second) {
+        int partSize = matrix.length / parts;
         int[] firstGenes = new int[matrix.length / 2];
         for (int i = 0; i < matrix.length / 2; i++) {
-            firstGenes[i] = first.getPath()[parentSize * 2 * (i / parentSize) + i % parentSize];
+            firstGenes[i] = first.getPath()[2 * partSize * (i / partSize) + i % partSize];
         }
 
         int[] path = new int[matrix.length];
         int currentSecond = 0;
         for (int i = 0; i < matrix.length; i++) {
-            if ((i / parentSize) % 2 == 0) {
+            if ((i / partSize) % 2 == 0) {
                 path[i] = first.getPath()[i];
                 continue;
             }
