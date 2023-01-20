@@ -1,6 +1,6 @@
 package lab.algorithms;
 
-import lab.entities.Path;
+import lab.entities.Individual;
 
 import java.util.*;
 import java.util.stream.IntStream;
@@ -8,51 +8,28 @@ import java.util.stream.IntStream;
 public class GeneticAlgorithm {
 
     private static final int POPULATION_SIZE = 1000;
-    private static final int BREEDING_POOL_SIZE = POPULATION_SIZE / 10;
     private static final long MAX_ITERATIONS = (long) Math.pow(10, 8);
 
-    public static Path solve(int[][] matrix, double mutationProbability, int parts) {
-        Path[] generation = createInitialGeneration(matrix);
-        Random random = new Random();
+    public static Individual solve(int[][] matrix, double mutationProbability) {
+        List<Individual> population = createInitialGeneration(matrix);
         for (long i = 0; i < MAX_ITERATIONS; i++) {
-            Path[] breedingPool = Arrays.stream(generation)
-                    .sorted(Comparator.comparing(Path::getCost))
-                    .limit(BREEDING_POOL_SIZE)
-                    .toArray(Path[]::new);
-            Path[] best = Arrays.stream(breedingPool)
-                    .limit(BREEDING_POOL_SIZE / 5)
-                    .toArray(Path[]::new);
-            double[] probabilities = getProbabilities(breedingPool);
-            Path[] newPopulation = new Path[matrix.length];
+            reproduce(population, matrix, mutationProbability);
+            removeWeak(population);
 
-            for (int j = 0; j < matrix.length; j++) {
-                if (j < BREEDING_POOL_SIZE / 5) {
-                    newPopulation[j] = best[j];
-                    continue;
-                }
-
-                Path first = breedingPool[choosePath(probabilities)];
-                Path second = breedingPool[choosePath(probabilities)];
-                newPopulation[j] = crossover(matrix, parts, first, second);
-                if (random.nextDouble() < mutationProbability) {
-                    mutate(newPopulation[j]);
-                }
-            }
-            generation = newPopulation;
             System.out.printf("Iteration: %d, Best cost: %d\n",
-                    i, getBestPath(generation).getCost());
+                    i, getBestPath(population).getCost());
         }
 
-        return getBestPath(generation);
+        return getBestPath(population);
     }
 
-    private static Path[] createInitialGeneration(int[][] matrix) {
-        Path[] generation = new Path[POPULATION_SIZE];
+    private static List<Individual> createInitialGeneration(int[][] matrix) {
+        List<Individual> generation = new ArrayList<>(POPULATION_SIZE);
         for (int i = 0; i < POPULATION_SIZE; i++) {
             List<Integer> pathList = new ArrayList<>(IntStream.range(0, matrix.length).boxed().toList());
             Collections.shuffle(pathList);
             int[] path = pathList.stream().mapToInt(Integer::intValue).toArray();
-            generation[i] = new Path(path, calcCost(matrix, path));
+            generation.add(new Individual(path, calcCost(matrix, path)));
         }
         return generation;
     }
@@ -65,69 +42,65 @@ public class GeneticAlgorithm {
         return sum + matrix[path[path.length - 1]][path[0]];
     }
 
-    private static void mutate(Path path) {
+    private static void reproduce(List<Individual> population, int[][] matrix, double mutationProbability) {
         Random random = new Random();
-        int first = random.nextInt(path.getPath().length - 1);
-        int second = random.nextInt(path.getPath().length - 1);
-        int temp = path.getPath()[first];
-        path.getPath()[first] = path.getPath()[second];
-        path.getPath()[second] = temp;
+        int parent0Index = random.nextInt(population.size());
+        int parent1Index = random.nextInt(population.size());
+        while (parent0Index == parent1Index) {
+            parent1Index = random.nextInt(population.size());
+        }
+        Individual parent0 = population.get(parent0Index);
+        Individual parent1 = population.get(parent1Index);
+        int splitPoint = random.nextInt(1, parent0.getPath().length);
+        Individual child0 = crossover(parent0, parent1, splitPoint, matrix);
+        Individual child1 = crossover(parent1, parent0, splitPoint, matrix);
+        population.add(child0);
+        population.add(child1);
+        mutate(child0, mutationProbability);
+        mutate(child1, mutationProbability);
     }
 
-    private static Path crossover(int[][] matrix, int parts, Path first, Path second) {
-        int partSize = matrix.length / parts;
-        int[] firstGenes = new int[matrix.length / 2];
-        for (int i = 0; i < matrix.length / 2; i++) {
-            firstGenes[i] = first.getPath()[2 * partSize * (i / partSize) + i % partSize];
-        }
-
-        int[] path = new int[matrix.length];
-        int currentSecond = 0;
-        for (int i = 0; i < matrix.length; i++) {
-            if ((i / partSize) % 2 == 0) {
-                path[i] = first.getPath()[i];
+    private static Individual crossover(Individual parent0, Individual parent1, int splitPoint, int[][] matrix) {
+        List<Integer> path = new ArrayList<>(Arrays.stream(parent0.getPath()).limit(splitPoint).boxed().toList());
+        for (int i = splitPoint; i < parent1.getPath().length; i++) {
+            if (path.contains(parent1.getPath()[i])) {
                 continue;
             }
-
-            while (Arrays.stream(firstGenes).boxed().toList().contains(second.getPath()[currentSecond])) {
-                currentSecond++;
-            }
-            path[i] = second.getPath()[currentSecond++];
+            path.add(parent1.getPath()[i]);
         }
-
-        return new Path(path, calcCost(matrix, path));
+        if (path.size() < parent0.getPath().length) {
+            for (int i = splitPoint; i < parent0.getPath().length; i++) {
+                if (path.contains(parent0.getPath()[i])) {
+                    continue;
+                }
+                path.add(parent0.getPath()[i]);
+            }
+        }
+        int[] pathArr = path.stream().mapToInt(num -> num).toArray();
+        return new Individual(pathArr, calcCost(matrix, pathArr));
     }
 
-    private static int choosePath(double[] probabilities) {
+    private static void mutate(Individual individual, double mutationProbability) {
         Random random = new Random();
-        double probability = random.nextDouble();
-        double sum = 0.0;
-        for (int i = 0; i < probabilities.length; i++) {
-            sum += probabilities[i];
-            if (sum > probability) {
-                return i;
-            }
+        if (random.nextDouble() < mutationProbability) {
+            return;
         }
-        return probabilities.length - 1;
+        int first = random.nextInt(individual.getPath().length - 1);
+        int second = random.nextInt(individual.getPath().length - 1);
+        int temp = individual.getPath()[first];
+        individual.getPath()[first] = individual.getPath()[second];
+        individual.getPath()[second] = temp;
     }
 
-    private static double[] getProbabilities(Path[] paths) {
-        double[] values = new double[paths.length];
-        double sum = 0.0;
-        for (int i = 0; i < paths.length; i++) {
-            values[i] = 1.0 / paths[i].getCost();
-            sum += values[i];
-        }
-        for (int i = 0; i < values.length; i++) {
-            values[i] /= sum;
-        }
-
-        return values;
+    private static void removeWeak(List<Individual> population) {
+        population.sort(Comparator.comparing(Individual::getCost));
+        population.remove(population.size() - 1);
+        population.remove(population.size() - 1);
     }
 
-    private static Path getBestPath(Path[] generation) {
-        return Arrays.stream(generation)
-                .min(Comparator.comparing(Path::getCost))
+    private static Individual getBestPath(List<Individual> population) {
+        return population.stream()
+                .min(Comparator.comparing(Individual::getCost))
                 .orElse(null);
     }
 }

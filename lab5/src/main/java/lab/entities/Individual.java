@@ -2,12 +2,12 @@ package lab.entities;
 
 import java.util.Arrays;
 
-public class Path {
+public class Individual {
 
     private final int[] path;
     private final int cost;
 
-    public Path(int[] path, int cost) {
+    public Individual(int[] path, int cost) {
         this.path = path;
         this.cost = cost;
     }
@@ -25,10 +25,10 @@ public class Path {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Path path = (Path) o;
+        Individual individual = (Individual) o;
 
-        if (cost != path.cost) return false;
-        return Arrays.equals(this.path, path.path);
+        if (cost != individual.cost) return false;
+        return Arrays.equals(this.path, individual.path);
     }
 
     @Override

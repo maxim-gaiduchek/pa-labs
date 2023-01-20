@@ -1,7 +1,7 @@
 package lab;
 
 import lab.algorithms.GeneticAlgorithm;
-import lab.entities.Path;
+import lab.entities.Individual;
 import lab.utils.Timer;
 
 import java.util.Random;
@@ -36,15 +36,14 @@ public class Main {
                 {52, 10, 57, 23, 8, 15, 37, 77, 116, 140, 72, 27, 82, 80, 117, 15, 56, 54, 101, 6},
                 {120, 63, 57, 133, 116, 73, 31, 128, 95, 34, 132, 67, 96, 137, 58, 37, 47, 80, 72, 94}
         };
-        double mutationProbability = 0.3;
-        int parts = 4;
+        double mutationProbability = 0.9;
         Timer timer = new Timer();
         System.out.println("Genetic algorithm in process...");
         timer.start();
-        Path path = GeneticAlgorithm.solve(matrix, mutationProbability, parts);
+        Individual individual = GeneticAlgorithm.solve(matrix, mutationProbability);
         timer.stop();
         System.out.println("Time spent: " + timer.getTime());
-        System.out.println("Best cost: " + path.getCost());
+        System.out.println("Best cost: " + individual.getCost());
     }
 
     private static int[][] generateMatrix() {
