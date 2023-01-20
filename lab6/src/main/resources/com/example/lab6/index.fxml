@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0"
+          prefWidth="800.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
+          fx:controller="com.example.lab6.controllers.GameController">
+    <columnConstraints>
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="75.0"/>
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="200.0"/>
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="250.0"/>
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="200.0"/>
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="75.0"/>
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints maxHeight="451.2" minHeight="10.0" prefHeight="180.6" vgrow="SOMETIMES"/>
+        <RowConstraints maxHeight="451.2" minHeight="10.0" prefHeight="246.6" vgrow="SOMETIMES"/>
+        <RowConstraints maxHeight="435.9999694824219" minHeight="10.0" prefHeight="120.40000000000003"
+                        vgrow="SOMETIMES"/>
+        <RowConstraints maxHeight="195.40000000000003" minHeight="10.0" prefHeight="53.60000000000002"
+                        vgrow="SOMETIMES"/>
+    </rowConstraints>
+    <children>
+        <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="3"
+              GridPane.rowIndex="1">
+            <children>
+                <ImageView fx:id="diceImage0" fitHeight="75.0" fitWidth="75.0" pickOnBounds="true" preserveRatio="true">
+                    <HBox.margin>
+                        <Insets bottom="10.0" left="45.0" right="45.0" top="10.0"/>
+                    </HBox.margin>
+                </ImageView>
+                <ImageView fx:id="diceImage1" fitHeight="75.0" fitWidth="75.0" pickOnBounds="true" preserveRatio="true">
+                    <HBox.margin>
+                        <Insets bottom="10.0" right="45.0" top="10.0"/>
+                    </HBox.margin>
+                </ImageView>
+                <ImageView fx:id="diceImage2" fitHeight="75.0" fitWidth="75.0" pickOnBounds="true" preserveRatio="true">
+                    <HBox.margin>
+                        <Insets bottom="10.0" right="45.0" top="10.0"/>
+                    </HBox.margin>
+                </ImageView>
+                <ImageView fx:id="diceImage3" fitHeight="75.0" fitWidth="75.0" pickOnBounds="true" preserveRatio="true">
+                    <HBox.margin>
+                        <Insets bottom="10.0" right="45.0" top="10.0"/>
+                    </HBox.margin>
+                </ImageView>
+                <ImageView fx:id="diceImage4" fitHeight="75.0" fitWidth="75.0" pickOnBounds="true" preserveRatio="true">
+                    <HBox.margin>
+                        <Insets bottom="10.0" right="45.0" top="10.0"/>
+                    </HBox.margin>
+                </ImageView>
+            </children>
+        </HBox>
+        <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="3" GridPane.rowIndex="3">
+            <children>
+                <Label alignment="CENTER" prefHeight="27.0" prefWidth="208.0" text="Ви" textAlignment="CENTER">
+                    <font>
+                        <Font size="18.0"/>
+                    </font>
+                </Label>
+                <Label fx:id="playerLabel" alignment="CENTER" prefHeight="27.0" prefWidth="210.0" text="Очок: 0"
+                       textAlignment="CENTER">
+                    <font>
+                        <Font size="18.0"/>
+                    </font>
+                </Label>
+            </children>
+        </VBox>
+        <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+            <children>
+                <Label alignment="CENTER" prefHeight="27.0" prefWidth="203.0" text="Супротивник" textAlignment="CENTER">
+                    <font>
+                        <Font size="18.0"/>
+                    </font>
+                </Label>
+                <Label fx:id="botLabel" alignment="CENTER" prefHeight="27.0" prefWidth="208.0" text="Очок: 0"
+                       textAlignment="CENTER">
+                    <font>
+                        <Font size="18.0"/>
+                    </font>
+                </Label>
+            </children>
+        </VBox>
+        <Button fx:id="throwDicesButton" mnemonicParsing="false" onMouseClicked="#throwDices" text="Кинути кубики"
+                GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2"
+                GridPane.valignment="CENTER">
+            <font>
+                <Font size="18.0"/>
+            </font>
+        </Button>
+    </children>
+</GridPane>
