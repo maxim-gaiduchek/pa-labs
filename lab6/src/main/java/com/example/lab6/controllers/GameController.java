@@ -1,19 +1,15 @@
 package com.example.lab6.controllers;
 
 import com.example.lab6.Main;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 
 public class GameController {
 
@@ -50,10 +46,23 @@ public class GameController {
 
     private int triesCounter = 3;
     private int pointsInRoundCounter = 0;
+    private boolean[] change = {true, true, true, true, true};
+    private List<Integer> dices = new ArrayList<>(List.of(0, 0, 0, 0, 0));
 
     @FXML
     private void throwDices() {
-        pointsInRoundCounter = calcAndShowResult();
+        if (!playerTurn) {
+            return;
+        }
+
+        calcAndShowResult(change);
+        pointsInRoundCounter = dices.stream().mapToInt(Integer::intValue).sum();
+        Arrays.fill(change, false);
+        diceImage0.setOpacity(1);
+        diceImage1.setOpacity(1);
+        diceImage2.setOpacity(1);
+        diceImage3.setOpacity(1);
+        diceImage4.setOpacity(1);
         triesCounter -= 1;
         updateRoundPointsLabel();
         updatePointsLabel();
@@ -72,6 +81,8 @@ public class GameController {
         playerPoints += pointsInRoundCounter;
         triesCounter = 3;
         pointsInRoundCounter = 0;
+        change = new boolean[]{true, true, true, true, true};
+        dices = new ArrayList<>(List.of(0, 0, 0, 0, 0));
         updateRoundPointsLabel();
         updatePointsLabel();
         updateTriesLabel();
@@ -79,49 +90,14 @@ public class GameController {
     }
 
     private void playBot() {
-
-    }
-
-    private List<Integer> randomize() {
-        Random random = new Random();
-        List<Integer> dices = new ArrayList<>(5);
-        for (int i = 0; i < 5; i++) {
-            dices.add(random.nextInt(1, 7));
+        roundsCounter--;
+        updateRoundLabel();
+        playerTurn = true;
+        if (roundsCounter == 0) {
+            endGame();
+        } else {
+            throwDicesButton.setDisable(false);
         }
-        return dices;
-    }
-
-    private int calcAndShowResult() {
-        List<Integer> dices = randomize();
-        setDiceImage(diceImage0, dices.get(0));
-        setDiceImage(diceImage1, dices.get(1));
-        setDiceImage(diceImage2, dices.get(2));
-        setDiceImage(diceImage3, dices.get(3));
-        setDiceImage(diceImage4, dices.get(4));
-
-        return dices.stream().mapToInt(Integer::intValue).sum();
-    }
-
-    private void setDiceImage(ImageView diceImage, int value) {
-        InputStream in = Main.class.getResourceAsStream("images/dice" + value + ".png");
-        diceImage.setImage(new Image(Objects.requireNonNull(in)));
-    }
-
-    private void updateRoundLabel() {
-        roundsLabel.setText("Раундів залишилось: " + roundsCounter);
-    }
-
-    private void updateTriesLabel() {
-        triesLabel.setText("К-сть спроб залишилось: " + triesCounter);
-    }
-
-    private void updateRoundPointsLabel() {
-        roundPointsLabel.setText("К-сть очок за раунд: " + pointsInRoundCounter);
-    }
-
-    private void updatePointsLabel() {
-        String ending = pointsInRoundCounter > 0 ? (" + " + pointsInRoundCounter ): "";
-        playerLabel.setText("Очок: " + playerPoints + ending);
     }
 
     private void endGame() {
@@ -145,8 +121,99 @@ public class GameController {
         updateRoundLabel();
         updateTriesLabel();
         updateRoundPointsLabel();
-        if (!playerTurn) {
-            throwDices();
+        updatePointsLabel();
+        throwDicesButton.setDisable(false);
+    }
+
+    private void calcAndShowResult(boolean[] change) {
+        randomize(change);
+        setDiceImage(diceImage0, dices.get(0));
+        setDiceImage(diceImage1, dices.get(1));
+        setDiceImage(diceImage2, dices.get(2));
+        setDiceImage(diceImage3, dices.get(3));
+        setDiceImage(diceImage4, dices.get(4));
+    }
+
+    private void randomize(boolean[] change) {
+        Random random = new Random();
+        for (int i = 0; i < 5; i++) {
+            if (!change[i]) {
+                continue;
+            }
+            dices.set(i, random.nextInt(1, 7));
         }
+    }
+
+    private void setDiceImage(ImageView diceImage, int value) {
+        InputStream in = Main.class.getResourceAsStream("images/dice" + value + ".png");
+        diceImage.setImage(new Image(Objects.requireNonNull(in)));
+    }
+
+    private void updateRoundLabel() {
+        roundsLabel.setText("Раундів залишилось: " + roundsCounter);
+    }
+
+    private void updateTriesLabel() {
+        triesLabel.setText("К-сть спроб залишилось: " + triesCounter);
+    }
+
+    private void updateRoundPointsLabel() {
+        roundPointsLabel.setText("К-сть очок за раунд: " + pointsInRoundCounter);
+    }
+
+    private void updatePointsLabel() {
+        String ending = pointsInRoundCounter > 0 ? (" + " + pointsInRoundCounter) : "";
+        playerLabel.setText("Очок: " + playerPoints + ending);
+        botLabel.setText("Очок: " + botPoints);
+    }
+
+    @FXML
+    private void selectDice0() {
+        if (triesCounter == 3 || triesCounter == 0) {
+            return;
+        }
+
+        change[0] = !change[0];
+        diceImage0.setOpacity(change[0] ? 0.5 : 1);
+    }
+
+    @FXML
+    private void selectDice1() {
+        if (triesCounter == 3 || triesCounter == 0) {
+            return;
+        }
+
+        change[1] = !change[1];
+        diceImage1.setOpacity(change[1] ? 0.5 : 1);
+    }
+
+    @FXML
+    private void selectDice2() {
+        if (triesCounter == 3 || triesCounter == 0) {
+            return;
+        }
+
+        change[2] = !change[2];
+        diceImage2.setOpacity(change[2] ? 0.5 : 1);
+    }
+
+    @FXML
+    private void selectDice3() {
+        if (triesCounter == 3 || triesCounter == 0) {
+            return;
+        }
+
+        change[3] = !change[3];
+        diceImage3.setOpacity(change[3] ? 0.5 : 1);
+    }
+
+    @FXML
+    private void selectDice4() {
+        if (triesCounter == 3 || triesCounter == 0) {
+            return;
+        }
+
+        change[4] = !change[4];
+        diceImage4.setOpacity(change[4] ? 0.5 : 1);
     }
 }

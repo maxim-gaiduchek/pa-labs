@@ -23,27 +23,27 @@
     <children>
         <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="1">
             <children>
-                <ImageView fx:id="diceImage0" fitHeight="75.0" fitWidth="75.0" pickOnBounds="true" preserveRatio="true">
+                <ImageView fx:id="diceImage0" fitHeight="75.0" fitWidth="75.0" onMouseClicked="#selectDice0" pickOnBounds="true" preserveRatio="true">
                     <HBox.margin>
                         <Insets bottom="10.0" left="45.0" right="45.0" top="10.0" />
                     </HBox.margin>
                 </ImageView>
-                <ImageView fx:id="diceImage1" fitHeight="75.0" fitWidth="75.0" pickOnBounds="true" preserveRatio="true">
+                <ImageView fx:id="diceImage1" fitHeight="75.0" fitWidth="75.0" onMouseClicked="#selectDice1" pickOnBounds="true" preserveRatio="true">
                     <HBox.margin>
                         <Insets bottom="10.0" right="45.0" top="10.0" />
                     </HBox.margin>
                 </ImageView>
-                <ImageView fx:id="diceImage2" fitHeight="75.0" fitWidth="75.0" pickOnBounds="true" preserveRatio="true">
+                <ImageView fx:id="diceImage2" fitHeight="75.0" fitWidth="75.0" onMouseClicked="#selectDice2" pickOnBounds="true" preserveRatio="true">
                     <HBox.margin>
                         <Insets bottom="10.0" right="45.0" top="10.0" />
                     </HBox.margin>
                 </ImageView>
-                <ImageView fx:id="diceImage3" fitHeight="75.0" fitWidth="75.0" pickOnBounds="true" preserveRatio="true">
+                <ImageView fx:id="diceImage3" fitHeight="75.0" fitWidth="75.0" onMouseClicked="#selectDice3" pickOnBounds="true" preserveRatio="true">
                     <HBox.margin>
                         <Insets bottom="10.0" right="45.0" top="10.0" />
                     </HBox.margin>
                 </ImageView>
-                <ImageView fx:id="diceImage4" fitHeight="75.0" fitWidth="75.0" pickOnBounds="true" preserveRatio="true">
+                <ImageView fx:id="diceImage4" fitHeight="75.0" fitWidth="75.0" onMouseClicked="#selectDice4" pickOnBounds="true" preserveRatio="true">
                     <HBox.margin>
                         <Insets bottom="10.0" right="45.0" top="10.0" />
                     </HBox.margin>
