@@ -1,5 +1,6 @@
 package com.example.lab6.controllers;
 
+import com.example.lab6.Game;
 import com.example.lab6.Main;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -9,7 +10,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import java.io.InputStream;
-import java.util.*;
+import java.util.Objects;
 
 public class GameController {
 
@@ -35,41 +36,35 @@ public class GameController {
     @FXML
     private Label roundsLabel;
     @FXML
+    private Label combinationLabel;
+    @FXML
     private Label triesLabel;
     @FXML
     private Label roundPointsLabel;
 
-    private boolean playerTurn = true; // System.currentTimeMillis() % 2 == 0;
-    private int roundsCounter = 10;
-    private int playerPoints = 0;
-    private int botPoints = 0;
-
-    private int triesCounter = 3;
-    private int pointsInRoundCounter = 0;
-    private boolean[] change = {true, true, true, true, true};
-    private List<Integer> dices = new ArrayList<>(List.of(0, 0, 0, 0, 0));
+    private final Game game = new Game();
 
     @FXML
     private void throwDices() {
-        if (!playerTurn) {
+        if (!game.isPlayerTurn()) {
             return;
         }
 
-        calcAndShowResult(change);
-        pointsInRoundCounter = dices.stream().mapToInt(Integer::intValue).sum();
-        Arrays.fill(change, false);
+        game.throwDices();
+        setDiceImage(diceImage0, game.getDice(0));
+        setDiceImage(diceImage1, game.getDice(1));
+        setDiceImage(diceImage2, game.getDice(2));
+        setDiceImage(diceImage3, game.getDice(3));
+        setDiceImage(diceImage4, game.getDice(4));
         diceImage0.setOpacity(1);
         diceImage1.setOpacity(1);
         diceImage2.setOpacity(1);
         diceImage3.setOpacity(1);
         diceImage4.setOpacity(1);
-        triesCounter -= 1;
         updateRoundPointsLabel();
         updatePointsLabel();
         updateTriesLabel();
-        if (triesCounter == 0) {
-            throwDicesButton.setDisable(true);
-        }
+        throwDicesButton.setDisable(true);
         endTurnButton.setDisable(false);
     }
 
@@ -77,12 +72,7 @@ public class GameController {
     private void endTurn() {
         throwDicesButton.setDisable(true);
         endTurnButton.setDisable(true);
-        playerTurn = false;
-        playerPoints += pointsInRoundCounter;
-        triesCounter = 3;
-        pointsInRoundCounter = 0;
-        change = new boolean[]{true, true, true, true, true};
-        dices = new ArrayList<>(List.of(0, 0, 0, 0, 0));
+        game.endTurn();
         updateRoundPointsLabel();
         updatePointsLabel();
         updateTriesLabel();
@@ -90,10 +80,10 @@ public class GameController {
     }
 
     private void playBot() {
-        roundsCounter--;
+        game.decrementRoundsCounter();
         updateRoundLabel();
-        playerTurn = true;
-        if (roundsCounter == 0) {
+        game.setPlayerTurn(true);
+        if (game.getRoundsCounter() == 0) {
             endGame();
         } else {
             throwDicesButton.setDisable(false);
@@ -102,9 +92,9 @@ public class GameController {
 
     private void endGame() {
         String prompt;
-        if (playerPoints > botPoints) {
+        if (game.hasPlayerWon()) {
             prompt = "Ти вийграв!";
-        } else if (playerPoints < botPoints) {
+        } else if (game.hasBotWon()) {
             prompt = "Ти програв(";
         } else {
             prompt = "Нічия";
@@ -112,36 +102,12 @@ public class GameController {
         Alert alert = new Alert(Alert.AlertType.INFORMATION, prompt);
         alert.showAndWait();
 
-        playerTurn = true; // System.currentTimeMillis() % 2 == 0;
-        roundsCounter = 10;
-        playerPoints = 0;
-        botPoints = 0;
-        triesCounter = 3;
-        pointsInRoundCounter = 0;
+        game.reset();
         updateRoundLabel();
         updateTriesLabel();
         updateRoundPointsLabel();
         updatePointsLabel();
         throwDicesButton.setDisable(false);
-    }
-
-    private void calcAndShowResult(boolean[] change) {
-        randomize(change);
-        setDiceImage(diceImage0, dices.get(0));
-        setDiceImage(diceImage1, dices.get(1));
-        setDiceImage(diceImage2, dices.get(2));
-        setDiceImage(diceImage3, dices.get(3));
-        setDiceImage(diceImage4, dices.get(4));
-    }
-
-    private void randomize(boolean[] change) {
-        Random random = new Random();
-        for (int i = 0; i < 5; i++) {
-            if (!change[i]) {
-                continue;
-            }
-            dices.set(i, random.nextInt(1, 7));
-        }
     }
 
     private void setDiceImage(ImageView diceImage, int value) {
@@ -150,70 +116,75 @@ public class GameController {
     }
 
     private void updateRoundLabel() {
-        roundsLabel.setText("Раундів залишилось: " + roundsCounter);
+        roundsLabel.setText("Раундів залишилось: " + game.getRoundsCounter());
     }
 
     private void updateTriesLabel() {
-        triesLabel.setText("К-сть спроб залишилось: " + triesCounter);
+        triesLabel.setText("К-сть спроб залишилось: " + game.getTriesCounter());
     }
 
     private void updateRoundPointsLabel() {
-        roundPointsLabel.setText("К-сть очок за раунд: " + pointsInRoundCounter);
+        roundPointsLabel.setText("К-сть очок за раунд: " + game.getPointsInRoundCounter());
     }
 
     private void updatePointsLabel() {
-        String ending = pointsInRoundCounter > 0 ? (" + " + pointsInRoundCounter) : "";
-        playerLabel.setText("Очок: " + playerPoints + ending);
-        botLabel.setText("Очок: " + botPoints);
+        String ending = game.getPointsInRoundCounter() > 0 ? (" + " + game.getPointsInRoundCounter()) : "";
+        playerLabel.setText("Очок: " + game.getPlayerPoints() + ending);
+        botLabel.setText("Очок: " + game.getBotPoints());
     }
 
     @FXML
     private void selectDice0() {
-        if (triesCounter == 3 || triesCounter == 0) {
+        if (game.getTriesCounter() == 3 || game.getTriesCounter() == 0) {
             return;
         }
 
-        change[0] = !change[0];
-        diceImage0.setOpacity(change[0] ? 0.5 : 1);
+        game.negateChanged(0);
+        diceImage0.setOpacity(game.getChanged(0) ? 0.5 : 1);
+        throwDicesButton.setDisable(!game.hasChanged());
     }
 
     @FXML
     private void selectDice1() {
-        if (triesCounter == 3 || triesCounter == 0) {
+        if (game.getTriesCounter() == 3 || game.getTriesCounter() == 0) {
             return;
         }
 
-        change[1] = !change[1];
-        diceImage1.setOpacity(change[1] ? 0.5 : 1);
+        game.negateChanged(1);
+        diceImage1.setOpacity(game.getChanged(1) ? 0.5 : 1);
+        throwDicesButton.setDisable(!game.hasChanged());
     }
 
     @FXML
     private void selectDice2() {
-        if (triesCounter == 3 || triesCounter == 0) {
+        if (game.getTriesCounter() == 3 || game.getTriesCounter() == 0) {
             return;
         }
 
-        change[2] = !change[2];
-        diceImage2.setOpacity(change[2] ? 0.5 : 1);
+        game.negateChanged(2);
+        diceImage2.setOpacity(game.getChanged(2) ? 0.5 : 1);
+        throwDicesButton.setDisable(!game.hasChanged());
     }
 
     @FXML
     private void selectDice3() {
-        if (triesCounter == 3 || triesCounter == 0) {
+        if (game.getTriesCounter() == 3 || game.getTriesCounter() == 0) {
             return;
         }
 
-        change[3] = !change[3];
-        diceImage3.setOpacity(change[3] ? 0.5 : 1);
+        game.negateChanged(3);
+        diceImage3.setOpacity(game.getChanged(3) ? 0.5 : 1);
+        throwDicesButton.setDisable(!game.hasChanged());
     }
 
     @FXML
     private void selectDice4() {
-        if (triesCounter == 3 || triesCounter == 0) {
+        if (game.getTriesCounter() == 3 || game.getTriesCounter() == 0) {
             return;
         }
 
-        change[4] = !change[4];
-        diceImage4.setOpacity(change[4] ? 0.5 : 1);
+        game.negateChanged(4);
+        diceImage4.setOpacity(game.getChanged(4) ? 0.5 : 1);
+        throwDicesButton.setDisable(!game.hasChanged());
     }
 }

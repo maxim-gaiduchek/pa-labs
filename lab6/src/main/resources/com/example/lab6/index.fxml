@@ -78,38 +78,52 @@
                 </Label>
             </children>
         </VBox>
-      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2" GridPane.rowIndex="2">
+        <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2" GridPane.rowIndex="2">
+            <children>
+                <Button fx:id="throwDicesButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onMouseClicked="#throwDices" text="Кинути кубики">
+                    <font>
+                        <Font size="18.0" />
+                    </font>
+                </Button>
+                <Button fx:id="endTurnButton" mnemonicParsing="false" onMouseClicked="#endTurn" prefHeight="40.0" prefWidth="145.0" text="Закінчити хід">
+                    <font>
+                        <Font size="18.0" />
+                    </font>
+                </Button>
+            </children>
+        </VBox>
+        <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2" GridPane.rowIndex="3">
+            <children>
+                <Label fx:id="triesLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="18.0" prefWidth="253.0" text="К-сть спроб залишилось: 0" textAlignment="CENTER">
+                    <font>
+                        <Font size="14.0" />
+                    </font>
+                </Label>
+                <Label fx:id="roundPointsLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="18.0" prefWidth="253.0" text="К-сть очок за раунд: 0" textAlignment="CENTER">
+                    <font>
+                        <Font size="14.0" />
+                    </font>
+                </Label>
+            </children>
+        </VBox>
+        <Label fx:id="roundsLabel" alignment="CENTER" prefHeight="18.0" prefWidth="343.0" text="Раундів залишилось: 10" GridPane.columnIndex="2">
+            <font>
+                <Font size="18.0" />
+            </font>
+        </Label>
+      <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="3" GridPane.rowIndex="2">
          <children>
-              <Button fx:id="throwDicesButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onMouseClicked="#throwDices" text="Кинути кубики">
-                  <font>
-                      <Font size="18.0" />
-                  </font>
-              </Button>
-            <Button fx:id="endTurnButton" mnemonicParsing="false" onMouseClicked="#endTurn" prefHeight="40.0" prefWidth="145.0" text="Закінчити хід">
+            <Label alignment="CENTER" prefHeight="18.0" prefWidth="208.0" text="Комбінація:">
                <font>
                   <Font size="18.0" />
                </font>
-            </Button>
-         </children>
-      </VBox>
-      <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="2" GridPane.rowIndex="3">
-         <children>
-            <Label fx:id="triesLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="18.0" prefWidth="253.0" text="К-сть спроб залишилось: 0" textAlignment="CENTER">
-               <font>
-                  <Font size="14.0" />
-               </font>
             </Label>
-            <Label fx:id="roundPointsLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="18.0" prefWidth="253.0" text="К-сть очок за раунд: 0" textAlignment="CENTER">
+            <Label fx:id="combinationLabel" alignment="CENTER" prefHeight="18.0" prefWidth="224.0" text="Нічого">
                <font>
-                  <Font size="14.0" />
+                  <Font size="18.0" />
                </font>
             </Label>
          </children>
       </VBox>
-      <Label fx:id="roundsLabel" alignment="CENTER" prefHeight="18.0" prefWidth="343.0" text="Раундів залишилось: 10" GridPane.columnIndex="2">
-         <font>
-            <Font size="18.0" />
-         </font>
-      </Label>
     </children>
 </GridPane>
