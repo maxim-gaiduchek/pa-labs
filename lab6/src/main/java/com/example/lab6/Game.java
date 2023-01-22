@@ -17,6 +17,8 @@ public class Game {
     private boolean[] changed = {true, true, true, true, true};
     private List<Integer> dices = new ArrayList<>(List.of(0, 0, 0, 0, 0));
 
+    // getters
+
     public boolean isPlayerTurn() {
         return playerTurn;
     }
@@ -66,6 +68,8 @@ public class Game {
         return false;
     }
 
+    // setters
+
     public void negateChanged(int i) {
         changed[i] = !changed[i];
     }
@@ -82,11 +86,52 @@ public class Game {
         roundsCounter--;
     }
 
-    public void throwDices() {
+    // game
+
+    public Combination throwDices() {
         randomize();
-        pointsInRoundCounter = dices.stream().mapToInt(Integer::intValue).sum();
         Arrays.fill(changed, false);
         triesCounter -= 1;
+        Combination combination;
+        List<Integer> sortedDices = dices.stream().sorted().toList();
+        boolean allSame = true;
+        int sameCount = 1, firstPartCount = 1;
+        boolean straight = true;
+        int previous = sortedDices.get(0);
+        for (int i = 1; i < sortedDices.size(); i++) {
+            int num = sortedDices.get(i);
+            if (previous == num) {
+                sameCount++;
+                if (allSame) {
+                    firstPartCount++;
+                }
+            } else {
+                allSame = false;
+                if (sameCount < 4) {
+                    sameCount = 1;
+                }
+            }
+            if (!allSame && straight && previous != num - 1) {
+                straight = false;
+            }
+            previous = sortedDices.get(i);
+        }
+        if (allSame) {
+            combination = Combination.GENERAL;
+            pointsInRoundCounter = triesCounter == 2 ? Integer.MAX_VALUE : 60;
+        } else if (sameCount == 4) {
+            combination = Combination.FOUR;
+            pointsInRoundCounter = triesCounter == 2 ? 45 : 40;
+        } else if (firstPartCount + sameCount == 5) {
+            combination = Combination.FULL_HOUSE;
+            pointsInRoundCounter = triesCounter == 2 ? 35 : 30;
+        } else if (straight) {
+            combination = Combination.STRAIGHT;
+            pointsInRoundCounter = triesCounter == 2 ? 25 : 20;
+        } else {
+            combination = Combination.NONE;
+        }
+        return combination;
     }
 
     public void randomize() {

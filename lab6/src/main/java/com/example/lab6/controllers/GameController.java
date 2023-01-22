@@ -1,5 +1,6 @@
 package com.example.lab6.controllers;
 
+import com.example.lab6.Combination;
 import com.example.lab6.Game;
 import com.example.lab6.Main;
 import javafx.fxml.FXML;
@@ -50,7 +51,8 @@ public class GameController {
             return;
         }
 
-        game.throwDices();
+        Combination combination = game.throwDices();
+        combinationLabel.setText(combination.getTitle());
         setDiceImage(diceImage0, game.getDice(0));
         setDiceImage(diceImage1, game.getDice(1));
         setDiceImage(diceImage2, game.getDice(2));
@@ -61,11 +63,15 @@ public class GameController {
         diceImage2.setOpacity(1);
         diceImage3.setOpacity(1);
         diceImage4.setOpacity(1);
-        updateRoundPointsLabel();
         updatePointsLabel();
         updateTriesLabel();
         throwDicesButton.setDisable(true);
-        endTurnButton.setDisable(false);
+        if (game.getTriesCounter() == 2 && combination == Combination.GENERAL) {
+            endGame();
+        } else {
+            endTurnButton.setDisable(false);
+            updateRoundPointsLabel();
+        }
     }
 
     @FXML
@@ -120,11 +126,11 @@ public class GameController {
     }
 
     private void updateTriesLabel() {
-        triesLabel.setText("К-сть спроб залишилось: " + game.getTriesCounter());
+        triesLabel.setText("Спроб залишилось: " + game.getTriesCounter());
     }
 
     private void updateRoundPointsLabel() {
-        roundPointsLabel.setText("К-сть очок за раунд: " + game.getPointsInRoundCounter());
+        roundPointsLabel.setText("Очок за раунд: " + game.getPointsInRoundCounter());
     }
 
     private void updatePointsLabel() {
