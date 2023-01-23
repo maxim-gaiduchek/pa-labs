@@ -3,6 +3,7 @@ package com.example.lab6.controllers;
 import com.example.lab6.Combination;
 import com.example.lab6.Game;
 import com.example.lab6.Main;
+import com.example.lab6.entities.Player;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -11,6 +12,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Objects;
 
 public class GameController {
@@ -43,64 +45,81 @@ public class GameController {
     @FXML
     private Label roundPointsLabel;
 
-    private final Game game = new Game();
-
     @FXML
     private void throwDices() {
-        if (!game.isPlayerTurn()) {
+        if (!Game.isPlayerTurn() || Game.getRoundsCounter() == 0) {
             return;
         }
 
-        Combination combination = game.throwDices();
+        Player player = Game.getCurrentPlayer();
+        Combination combination = player.throwDices();
         combinationLabel.setText(combination.getTitle());
-        setDiceImage(diceImage0, game.getDice(0));
-        setDiceImage(diceImage1, game.getDice(1));
-        setDiceImage(diceImage2, game.getDice(2));
-        setDiceImage(diceImage3, game.getDice(3));
-        setDiceImage(diceImage4, game.getDice(4));
-        diceImage0.setOpacity(1);
-        diceImage1.setOpacity(1);
-        diceImage2.setOpacity(1);
-        diceImage3.setOpacity(1);
-        diceImage4.setOpacity(1);
-        updatePointsLabel();
-        updateTriesLabel();
+        setDiceImages(player.getDices());
+        updatePointsLabel(Game.isPlayerTurn(), player.getPoints(), player.getRoundPoints());
+        updateRoundPointsLabel(player.getRoundPoints());
+        updateTriesLabel(player.getTries());
         throwDicesButton.setDisable(true);
-        if (game.getTriesCounter() == 2 && combination == Combination.GENERAL) {
+        if (player.getTries() == 2 && combination == Combination.GENERAL) {
             endGame();
         } else {
             endTurnButton.setDisable(false);
-            updateRoundPointsLabel();
+            updateRoundPointsLabel(player.getRoundPoints());
         }
     }
 
     @FXML
     private void endTurn() {
+        if (!Game.isPlayerTurn() || Game.getRoundsCounter() == 0) {
+            return;
+        }
+
         throwDicesButton.setDisable(true);
         endTurnButton.setDisable(true);
-        game.endTurn();
-        updateRoundPointsLabel();
-        updatePointsLabel();
-        updateTriesLabel();
-        playBot();
-    }
-
-    private void playBot() {
-        game.decrementRoundsCounter();
+        Player player = Game.getCurrentPlayer();
+        player.addPoints();
+        updatePointsLabel(Game.isPlayerTurn(), player.getPoints(), player.getRoundPoints());
+        Game.endTurn();
+        player = Game.getCurrentPlayer();
+        updateRoundPointsLabel(player.getRoundPoints());
+        updatePointsLabel(Game.isPlayerTurn(), player.getPoints(), player.getRoundPoints());
+        updateTriesLabel(player.getTries());
+        while (!Game.isPlayerTurn()) {
+            playBot();
+        }
         updateRoundLabel();
-        game.setPlayerTurn(true);
-        if (game.getRoundsCounter() == 0) {
+        if (Game.getRoundsCounter() == 0) {
             endGame();
         } else {
             throwDicesButton.setDisable(false);
         }
     }
 
+    private void playBot() {
+        if (Game.isPlayerTurn() || Game.getRoundsCounter() == 0) {
+            return;
+        }
+
+        Player player = Game.getCurrentPlayer();
+        for (int i = 0; i < 3; i++) {
+            player.playBot(i);
+            if (player.hasNotChanged()) {
+                break;
+            }
+            Combination combination = player.throwDices();
+            combinationLabel.setText(combination.getTitle());
+            setDiceImages(player.getDices());
+            updatePointsLabel(Game.isPlayerTurn(), player.getPoints(), player.getRoundPoints());
+            updateRoundPointsLabel(player.getRoundPoints());
+            updateTriesLabel(player.getTries());
+        }
+        Game.endTurn();
+    }
+
     private void endGame() {
         String prompt;
-        if (game.hasPlayerWon()) {
+        if (Game.hasPlayerWon()) {
             prompt = "Ти вийграв!";
-        } else if (game.hasBotWon()) {
+        } else if (Game.hasBotWon()) {
             prompt = "Ти програв(";
         } else {
             prompt = "Нічия";
@@ -108,12 +127,32 @@ public class GameController {
         Alert alert = new Alert(Alert.AlertType.INFORMATION, prompt);
         alert.showAndWait();
 
-        game.reset();
+        Game.reset();
+        Player player = Game.getCurrentPlayer();
         updateRoundLabel();
-        updateTriesLabel();
-        updateRoundPointsLabel();
-        updatePointsLabel();
+        updateTriesLabel(player.getTries());
+        updateRoundPointsLabel(player.getPoints());
+        updatePointsLabel(true, 0, 0);
+        updatePointsLabel(false, 0, 0);
+        endTurnButton.setDisable(true);
+        throwDicesButton.setDisable(true);
+        while (!Game.isPlayerTurn()) {
+            playBot();
+        }
         throwDicesButton.setDisable(false);
+    }
+
+    private void setDiceImages(List<Integer> dices) {
+        setDiceImage(diceImage0, dices.get(0));
+        setDiceImage(diceImage1, dices.get(1));
+        setDiceImage(diceImage2, dices.get(2));
+        setDiceImage(diceImage3, dices.get(3));
+        setDiceImage(diceImage4, dices.get(4));
+        diceImage0.setOpacity(1);
+        diceImage1.setOpacity(1);
+        diceImage2.setOpacity(1);
+        diceImage3.setOpacity(1);
+        diceImage4.setOpacity(1);
     }
 
     private void setDiceImage(ImageView diceImage, int value) {
@@ -122,75 +161,85 @@ public class GameController {
     }
 
     private void updateRoundLabel() {
-        roundsLabel.setText("Раундів залишилось: " + game.getRoundsCounter());
+        roundsLabel.setText("Раундів залишилось: " + Game.getRoundsCounter());
     }
 
-    private void updateTriesLabel() {
-        triesLabel.setText("Спроб залишилось: " + game.getTriesCounter());
+    private void updateTriesLabel(int tries) {
+        triesLabel.setText("Спроб залишилось: " + tries);
     }
 
-    private void updateRoundPointsLabel() {
-        roundPointsLabel.setText("Очок за раунд: " + game.getPointsInRoundCounter());
+    private void updateRoundPointsLabel(int points) {
+        roundPointsLabel.setText("Очок за раунд: " + points);
     }
 
-    private void updatePointsLabel() {
-        String ending = game.getPointsInRoundCounter() > 0 ? (" + " + game.getPointsInRoundCounter()) : "";
-        playerLabel.setText("Очок: " + game.getPlayerPoints() + ending);
-        botLabel.setText("Очок: " + game.getBotPoints());
+    private void updatePointsLabel(boolean playerTurn, int points, int roundPoints) {
+        Label label = playerTurn ? playerLabel : botLabel;
+        String ending = roundPoints > 0 ? (" + " + roundPoints) : "";
+        label.setText("Очок: " + points + ending);
     }
 
     @FXML
     private void selectDice0() {
-        if (game.getTriesCounter() == 3 || game.getTriesCounter() == 0) {
+        Player player = Game.getCurrentPlayer();
+
+        if (player.getTries() == 3 || player.getTries() == 0) {
             return;
         }
 
-        game.negateChanged(0);
-        diceImage0.setOpacity(game.getChanged(0) ? 0.5 : 1);
-        throwDicesButton.setDisable(!game.hasChanged());
+        player.negateChanged(0);
+        diceImage0.setOpacity(player.getChanged(0) ? 0.5 : 1);
+        throwDicesButton.setDisable(player.hasNotChanged());
     }
 
     @FXML
     private void selectDice1() {
-        if (game.getTriesCounter() == 3 || game.getTriesCounter() == 0) {
+        Player player = Game.getCurrentPlayer();
+
+        if (player.getTries() == 3 || player.getTries() == 0) {
             return;
         }
 
-        game.negateChanged(1);
-        diceImage1.setOpacity(game.getChanged(1) ? 0.5 : 1);
-        throwDicesButton.setDisable(!game.hasChanged());
+        player.negateChanged(1);
+        diceImage1.setOpacity(player.getChanged(1) ? 0.5 : 1);
+        throwDicesButton.setDisable(player.hasNotChanged());
     }
 
     @FXML
     private void selectDice2() {
-        if (game.getTriesCounter() == 3 || game.getTriesCounter() == 0) {
+        Player player = Game.getCurrentPlayer();
+
+        if (player.getTries() == 3 || player.getTries() == 0) {
             return;
         }
 
-        game.negateChanged(2);
-        diceImage2.setOpacity(game.getChanged(2) ? 0.5 : 1);
-        throwDicesButton.setDisable(!game.hasChanged());
+        player.negateChanged(2);
+        diceImage2.setOpacity(player.getChanged(2) ? 0.5 : 1);
+        throwDicesButton.setDisable(player.hasNotChanged());
     }
 
     @FXML
     private void selectDice3() {
-        if (game.getTriesCounter() == 3 || game.getTriesCounter() == 0) {
+        Player player = Game.getCurrentPlayer();
+
+        if (player.getTries() == 3 || player.getTries() == 0) {
             return;
         }
 
-        game.negateChanged(3);
-        diceImage3.setOpacity(game.getChanged(3) ? 0.5 : 1);
-        throwDicesButton.setDisable(!game.hasChanged());
+        player.negateChanged(3);
+        diceImage3.setOpacity(player.getChanged(3) ? 0.5 : 1);
+        throwDicesButton.setDisable(player.hasNotChanged());
     }
 
     @FXML
     private void selectDice4() {
-        if (game.getTriesCounter() == 3 || game.getTriesCounter() == 0) {
+        Player player = Game.getCurrentPlayer();
+
+        if (player.getTries() == 3 || player.getTries() == 0) {
             return;
         }
 
-        game.negateChanged(4);
-        diceImage4.setOpacity(game.getChanged(4) ? 0.5 : 1);
-        throwDicesButton.setDisable(!game.hasChanged());
+        player.negateChanged(4);
+        diceImage4.setOpacity(player.getChanged(4) ? 0.5 : 1);
+        throwDicesButton.setDisable(player.hasNotChanged());
     }
 }
