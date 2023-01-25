@@ -1,6 +1,8 @@
 package com.example.lab6.entities;
 
 import com.example.lab6.Combination;
+import com.example.lab6.algorithms.MinimaxAlgorithm;
+import com.example.lab6.algorithms.MinimaxResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,7 +14,7 @@ public class Player {
     private int points = 0;
     private int tries = 3;
     private int roundPoints = 0;
-    private boolean[] changed = {true, true, true, true, true};
+    private boolean[] changes = {true, true, true, true, true};
     private List<Integer> dices = new ArrayList<>(List.of(0, 0, 0, 0, 0));
 
     // getters
@@ -29,8 +31,8 @@ public class Player {
         return roundPoints;
     }
 
-    public boolean[] getChanged() {
-        return changed;
+    public boolean[] getChanges() {
+        return changes;
     }
 
     public List<Integer> getDices() {
@@ -45,13 +47,13 @@ public class Player {
         return dices.get(i);
     }
 
-    public boolean getChanged(int i) {
-        return changed[i];
+    public boolean getChanges(int i) {
+        return changes[i];
     }
 
-    public boolean hasNotChanged() {
-        for (boolean changed : this.changed) {
-            if (changed) {
+    public boolean hasNotChanges() {
+        for (boolean changes : this.changes) {
+            if (changes) {
                 return false;
             }
         }
@@ -69,12 +71,12 @@ public class Player {
         roundPoints = 0;
     }
 
-    public void negateChanged(int i) {
-        changed[i] = !changed[i];
+    public void negateChange(int i) {
+        changes[i] = !changes[i];
     }
 
-    public void setChanged(boolean changed, int i) {
-        this.changed[i] = changed;
+    public void setChange(boolean changed, int i) {
+        this.changes[i] = changed;
     }
 
     // game
@@ -82,88 +84,39 @@ public class Player {
     public void randomize() {
         Random random = new Random();
         for (int i = 0; i < 5; i++) {
-            if (!changed[i]) {
+            if (!changes[i]) {
                 continue;
             }
             dices.set(i, random.nextInt(1, 7));
         }
-        Arrays.fill(changed, false);
+        Arrays.fill(changes, false);
     }
 
     public void reset() {
         tries = 3;
         roundPoints = 0;
-        Arrays.fill(changed, true);
+        Arrays.fill(changes, true);
         dices = new ArrayList<>(List.of(0, 0, 0, 0, 0));
     }
 
     public Combination throwDices() {
         randomize();
-        Combination combination;
-        List<Integer> sortedDices = getSortedDices();
-        boolean allSame = true;
-        int sameCount = 1, firstPartCount = 1;
-        boolean straight = true;
-        int previous = sortedDices.get(0);
-        for (int i = 1; i < sortedDices.size(); i++) {
-            int num = sortedDices.get(i);
-            if (previous == num) {
-                sameCount++;
-                if (allSame) {
-                    firstPartCount++;
-                }
-            } else {
-                allSame = false;
-                if (sameCount < 4) {
-                    sameCount = 1;
-                }
-            }
-            if (!allSame && straight && previous != num - 1) {
-                straight = false;
-            }
-            previous = sortedDices.get(i);
-        }
-
-        if (allSame) {
-            combination = Combination.GENERAL;
-            roundPoints = tries == 3 ? Integer.MAX_VALUE : 60;
-        } else if (sameCount == 4) {
-            combination = Combination.FOUR;
-            roundPoints = tries == 3 ? 45 : 40;
-        } else if (firstPartCount + sameCount == 5) {
-            combination = Combination.FULL_HOUSE;
-            roundPoints = tries == 3 ? 35 : 30;
-        } else if (straight) {
-            combination = Combination.STRAIGHT;
-            roundPoints = tries == 3 ? 25 : 20;
-        } else {
-            combination = Combination.NONE;
-        }
+        Combination combination = Combination.calcCombination(dices);
+        roundPoints = combination.getPoints(tries);
         tries -= 1;
         return combination;
     }
 
-    public void playBot(int tryNumber) {
+    public void findOptimal(int tryNumber) {
         if (tryNumber == 0) {
-            Arrays.fill(changed, true);
+            Arrays.fill(changes, true);
             return;
         }
 
-        changed = minimax(0, changed, true, 3 - tryNumber);
-    }
-
-    private boolean[] minimax(int score, boolean[] changed, boolean maxing, int depth) {
-        if (depth <= 1) {
-            return changed;
-        }
-
-        if (maxing) {
-
-        } else {
-
-        }
-
-        return changed;
+        Arrays.fill(changes, false);
+        MinimaxResult result = MinimaxAlgorithm.findOptimal(
+                roundPoints, changes, dices, true, 3 - tryNumber);
+        changes = result.getChanges();
     }
 
     // core
@@ -174,7 +127,7 @@ public class Player {
                 "points=" + points +
                 ", tries=" + tries +
                 ", roundPoints=" + roundPoints +
-                ", changed=" + Arrays.toString(changed) +
+                ", changed=" + Arrays.toString(changes) +
                 ", dices=" + dices +
                 '}';
     }

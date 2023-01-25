@@ -55,7 +55,7 @@ public class GameController {
         Combination combination = player.throwDices();
         combinationLabel.setText(combination.getTitle());
         setDiceImages(player.getDices());
-        updatePointsLabel(Game.isPlayerTurn(), player.getPoints(), player.getRoundPoints());
+        updatePointsLabel(player);
         updateRoundPointsLabel(player.getRoundPoints());
         updateTriesLabel(player.getTries());
         throwDicesButton.setDisable(true);
@@ -77,11 +77,11 @@ public class GameController {
         endTurnButton.setDisable(true);
         Player player = Game.getCurrentPlayer();
         player.addPoints();
-        updatePointsLabel(Game.isPlayerTurn(), player.getPoints(), player.getRoundPoints());
+        updatePointsLabel(player);
         Game.endTurn();
         player = Game.getCurrentPlayer();
         updateRoundPointsLabel(player.getRoundPoints());
-        updatePointsLabel(Game.isPlayerTurn(), player.getPoints(), player.getRoundPoints());
+        updatePointsLabel(player);
         updateTriesLabel(player.getTries());
         while (!Game.isPlayerTurn()) {
             playBot();
@@ -101,17 +101,19 @@ public class GameController {
 
         Player player = Game.getCurrentPlayer();
         for (int i = 0; i < 3; i++) {
-            player.playBot(i);
-            if (player.hasNotChanged()) {
+            player.findOptimal(i);
+            if (player.hasNotChanges()) {
                 break;
             }
             Combination combination = player.throwDices();
             combinationLabel.setText(combination.getTitle());
             setDiceImages(player.getDices());
-            updatePointsLabel(Game.isPlayerTurn(), player.getPoints(), player.getRoundPoints());
+            updatePointsLabel(player);
             updateRoundPointsLabel(player.getRoundPoints());
             updateTriesLabel(player.getTries());
         }
+        player.addPoints();
+        updatePointsLabel(player);
         Game.endTurn();
     }
 
@@ -172,6 +174,10 @@ public class GameController {
         roundPointsLabel.setText("Очок за раунд: " + points);
     }
 
+    private void updatePointsLabel(Player player) {
+        updatePointsLabel(Game.isPlayerTurn(), player.getPoints(), player.getRoundPoints());
+    }
+
     private void updatePointsLabel(boolean playerTurn, int points, int roundPoints) {
         Label label = playerTurn ? playerLabel : botLabel;
         String ending = roundPoints > 0 ? (" + " + roundPoints) : "";
@@ -186,9 +192,9 @@ public class GameController {
             return;
         }
 
-        player.negateChanged(0);
-        diceImage0.setOpacity(player.getChanged(0) ? 0.5 : 1);
-        throwDicesButton.setDisable(player.hasNotChanged());
+        player.negateChange(0);
+        diceImage0.setOpacity(player.getChanges(0) ? 0.5 : 1);
+        throwDicesButton.setDisable(player.hasNotChanges());
     }
 
     @FXML
@@ -199,9 +205,9 @@ public class GameController {
             return;
         }
 
-        player.negateChanged(1);
-        diceImage1.setOpacity(player.getChanged(1) ? 0.5 : 1);
-        throwDicesButton.setDisable(player.hasNotChanged());
+        player.negateChange(1);
+        diceImage1.setOpacity(player.getChanges(1) ? 0.5 : 1);
+        throwDicesButton.setDisable(player.hasNotChanges());
     }
 
     @FXML
@@ -212,9 +218,9 @@ public class GameController {
             return;
         }
 
-        player.negateChanged(2);
-        diceImage2.setOpacity(player.getChanged(2) ? 0.5 : 1);
-        throwDicesButton.setDisable(player.hasNotChanged());
+        player.negateChange(2);
+        diceImage2.setOpacity(player.getChanges(2) ? 0.5 : 1);
+        throwDicesButton.setDisable(player.hasNotChanges());
     }
 
     @FXML
@@ -225,9 +231,9 @@ public class GameController {
             return;
         }
 
-        player.negateChanged(3);
-        diceImage3.setOpacity(player.getChanged(3) ? 0.5 : 1);
-        throwDicesButton.setDisable(player.hasNotChanged());
+        player.negateChange(3);
+        diceImage3.setOpacity(player.getChanges(3) ? 0.5 : 1);
+        throwDicesButton.setDisable(player.hasNotChanges());
     }
 
     @FXML
@@ -238,8 +244,8 @@ public class GameController {
             return;
         }
 
-        player.negateChanged(4);
-        diceImage4.setOpacity(player.getChanged(4) ? 0.5 : 1);
-        throwDicesButton.setDisable(player.hasNotChanged());
+        player.negateChange(4);
+        diceImage4.setOpacity(player.getChanges(4) ? 0.5 : 1);
+        throwDicesButton.setDisable(player.hasNotChanges());
     }
 }
