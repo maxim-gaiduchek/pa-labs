@@ -3,7 +3,6 @@ package com.example.lab6.algorithms;
 import com.example.lab6.Combination;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class MinimaxAlgorithm {
@@ -17,10 +16,11 @@ public class MinimaxAlgorithm {
         }
 
         MinimaxResult result = new MinimaxResult(Integer.MIN_VALUE, null);
+        boolean[] caseChanges;
         if (maxing) {
-            for (int i = 1; i <= 5; i++) {
+            for (int i = 0; i <= 5; i++) {
                 for (String change : createChanges("", 5, i, 0)) {
-                    boolean[] caseChanges = new boolean[5];
+                    caseChanges = new boolean[5];
                     for (int j = 0; j < 5; j++) {
                         caseChanges[j] = change.charAt(j) == '1';
                     }

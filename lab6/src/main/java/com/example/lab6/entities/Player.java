@@ -31,20 +31,8 @@ public class Player {
         return roundPoints;
     }
 
-    public boolean[] getChanges() {
-        return changes;
-    }
-
     public List<Integer> getDices() {
         return dices;
-    }
-
-    public List<Integer> getSortedDices() {
-        return dices.stream().sorted().toList();
-    }
-
-    public int getDice(int i) {
-        return dices.get(i);
     }
 
     public boolean getChanges(int i) {
@@ -73,10 +61,6 @@ public class Player {
 
     public void negateChange(int i) {
         changes[i] = !changes[i];
-    }
-
-    public void setChange(boolean changed, int i) {
-        this.changes[i] = changed;
     }
 
     // game
@@ -114,8 +98,7 @@ public class Player {
         }
 
         Arrays.fill(changes, false);
-        MinimaxResult result = MinimaxAlgorithm.findOptimal(
-                roundPoints, changes, dices, true, 3 - tryNumber);
+        MinimaxResult result = MinimaxAlgorithm.findOptimal(roundPoints, changes, dices, true, 3 - tryNumber);
         changes = result.getChanges();
     }
 
